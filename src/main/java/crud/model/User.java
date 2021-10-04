@@ -2,9 +2,11 @@ package crud.model;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -20,7 +22,7 @@ public class User implements UserDetails {
     private String username;
 
     @Column(name = "surname")
-    private String lastName;
+    private String surname;
 
     @Column(name = "phone_number")
     private String phoneNumber;
@@ -28,10 +30,9 @@ public class User implements UserDetails {
     @Column(name = "email")
     private String email;
 
-    @Column
+    @Column(name = "password")
     private String password;
 
-    //список ролей загружается вместе с пользователем сразу (не ждет пока к нему обратятся).
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "users_id"),
             inverseJoinColumns = @JoinColumn(name = "roles_id"))
@@ -40,11 +41,10 @@ public class User implements UserDetails {
     public User() {
     }
 
-    public User(Long id, String username, String lastName, String phoneNumber, String email, String password,
-                Set<Role> roles) {
-        this.id = id;
+    public User(String username, String surname, String email, String phoneNumber,
+                String password, Set<Role> roles) {
         this.username = username;
-        this.lastName = lastName;
+        this.surname = surname;
         this.phoneNumber = phoneNumber;
         this.email = email;
         this.password = password;
@@ -63,12 +63,12 @@ public class User implements UserDetails {
         this.username = username;
     }
 
-    public String getLastName() {
-        return lastName;
+    public String getSurname() {
+        return surname;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setSurname(String lastName) {
+        this.surname = lastName;
     }
 
     public String getPhoneNumber() {
@@ -139,7 +139,7 @@ public class User implements UserDetails {
         return "User{" +
                 "id=" + id +
                 ", username='" + username + '\'' +
-                ", lastName='" + lastName + '\'' +
+                ", lastName='" + surname + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +

@@ -6,10 +6,13 @@ import crud.service.RoleService;
 import crud.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.PostConstruct;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,6 +21,9 @@ public class UserController {
 
     private final UserService userService;
     private final RoleService roleService;
+
+    @Autowired
+    PasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
     public UserController(UserService userService, RoleService roleService) {
@@ -31,7 +37,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/user")
-    public String userInfo(@AuthenticationPrincipal User user, Model model){
+    public String userInfo(@AuthenticationPrincipal User user, Model model) {
         model.addAttribute("user", user);
         model.addAttribute("roles", user.getRoles());
         return "userpage";
@@ -43,29 +49,23 @@ public class UserController {
         return "adminpage";
     }
 
-    @GetMapping(value = "/admin/new")
-    public String newUser(Model model) {
-        model.addAttribute("user", new User());
-        model.addAttribute("roles", roleService.getAllRoles());
-        return "new";
-    }
-
     @PostMapping(value = "/admin/add-user")
-    public String addUser(@ModelAttribute User user, @RequestParam(value = "checkBoxRoles") String[] checkBoxRoles) {
+    public String addUser(@ModelAttribute User user, @RequestParam(value = "checkBoxRoles") String[] checkBoxRoles,
+                          BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "redirect:/admin";
+        }
+
         Set<Role> roleSet = new HashSet<>();
         for (String role : checkBoxRoles) {
             roleSet.add(roleService.getRoleByName(role));
         }
         user.setRoles(roleSet);
         userService.addUser(user);
-//        Set<Role> roleSet = Stream.of(checkBoxRoles).forEach();
-//        user.setRoles(roleSet);
-//        userService.addUser(user);
 
         return "redirect:/admin";
     }
 
-    //страница для редактирования юзеров
     @GetMapping(value = "/edit/{id}")
     public String editUserForm(@PathVariable("id") long id, Model model) {
         model.addAttribute("user", userService.getUserById(id));
@@ -73,8 +73,14 @@ public class UserController {
         return "edit";
     }
 
-    @PostMapping(value = "/edit")
-    public String editUser(@ModelAttribute User user, @RequestParam(value = "checkBoxRoles") String[] checkBoxRoles) {
+    @PatchMapping(value = "/edit/{id}")
+    public String editUser(@ModelAttribute("user") User user, @PathVariable("id") long id,
+                           @RequestParam(value = "checkBoxRoles") String[] checkBoxRoles,
+                           BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "redirect:/admin";
+        }
+
         Set<Role> roleSet = new HashSet<>();
         for (String roles : checkBoxRoles) {
             roleSet.add(roleService.getRoleByName(roles));
@@ -84,9 +90,29 @@ public class UserController {
         return "redirect:/admin";
     }
 
-    @GetMapping(value = "/remove/{id}")
+    @DeleteMapping(value = "/remove/{id}")
     public String removeUser(@PathVariable("id") long id) {
         userService.removeUserById(id);
         return "redirect:/admin";
+    }
+
+    @PostConstruct
+    private void postConstruct() {
+        Role roleAdmin = new Role("ROLE_ADMIN");
+        Role roleUser = new Role("ROLE_USER");
+        roleService.addRole(roleAdmin);
+        roleService.addRole(roleUser);
+
+        Set<Role> roleSetAdmin = new HashSet<>();
+        roleSetAdmin.add(roleService.getRoleByName("ROLE_ADMIN"));
+        User admin = new User("admin", "adminSurname", "admin@gmail.com", "123456",
+                bCryptPasswordEncoder.encode("admin"), roleSetAdmin);
+        userService.addUser(admin);
+
+        Set<Role> roleSetUser = new HashSet<>();
+        roleSetUser.add(roleService.getRoleByName("ROLE_USER"));
+        User user = new User("user", "surnameUser", "user@gmail.com", "456789",
+                bCryptPasswordEncoder.encode("user"), roleSetUser);
+        userService.addUser(user);
     }
 }

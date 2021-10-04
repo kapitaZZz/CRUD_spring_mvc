@@ -22,7 +22,7 @@ import java.util.Properties;
 @ComponentScan("crud")
 public class HibernateConfig {
 
-    private Environment environment; //переменная для получения свойств из файла проперти
+    private Environment environment;
 
     @Autowired
     public void setEnvironment(Environment environment) {
@@ -43,8 +43,8 @@ public class HibernateConfig {
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean entityManager = new LocalContainerEntityManagerFactoryBean();
         entityManager.setDataSource(getDataSource());
-        entityManager.setPackagesToScan("crud.model"); // указывается пакет в котором находятся сущности
-        entityManager.setJpaVendorAdapter(new HibernateJpaVendorAdapter());// в качестве JPA адаптера будет использоваться хибер
+        entityManager.setPackagesToScan("crud.model");
+        entityManager.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
 
         Properties props = new Properties();
         props.put("hibernate.show_sql", environment.getRequiredProperty("hibernate.show_sql"));

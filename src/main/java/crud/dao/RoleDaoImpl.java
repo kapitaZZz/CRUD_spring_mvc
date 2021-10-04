@@ -5,11 +5,13 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
 import java.util.List;
 
 @Repository
 public class RoleDaoImpl implements RoleDao {
+
+    private String userRole = "ROLE_USER";
+    private String adminRole = "ROLE_ADMIN";
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -31,14 +33,15 @@ public class RoleDaoImpl implements RoleDao {
 
     @Override
     public List<Role> getAllRoles() {
-        return entityManager.createQuery("from Role").getResultList();
+        return entityManager.createQuery("from Role", Role.class).getResultList();
     }
 
     @Override
     public Role getRoleByName(String name) {
-        TypedQuery<Role> queryRole = entityManager.createQuery("select r from Role r where r.name=:role",
-                Role.class).setParameter("role", name);
-        return queryRole.getSingleResult();
+        return entityManager.createQuery("select r from Role r where r.name=:role",
+                Role.class).setParameter("role", name).getSingleResult();
+
     }
+
 }
 

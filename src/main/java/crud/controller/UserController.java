@@ -96,23 +96,4 @@ public class UserController {
         return "redirect:/admin";
     }
 
-    @PostConstruct
-    private void postConstruct() {
-        Role roleAdmin = new Role("ROLE_ADMIN");
-        Role roleUser = new Role("ROLE_USER");
-        roleService.addRole(roleAdmin);
-        roleService.addRole(roleUser);
-
-        Set<Role> roleSetAdmin = new HashSet<>();
-        roleSetAdmin.add(roleService.getRoleByName("ROLE_ADMIN"));
-        User admin = new User("admin", "adminSurname", "admin@gmail.com", "123456",
-                bCryptPasswordEncoder.encode("admin"), roleSetAdmin);
-        userService.addUser(admin);
-
-        Set<Role> roleSetUser = new HashSet<>();
-        roleSetUser.add(roleService.getRoleByName("ROLE_USER"));
-        User user = new User("user", "surnameUser", "user@gmail.com", "456789",
-                bCryptPasswordEncoder.encode("user"), roleSetUser);
-        userService.addUser(user);
-    }
 }

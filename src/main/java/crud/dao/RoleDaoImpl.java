@@ -10,9 +10,6 @@ import java.util.List;
 @Repository
 public class RoleDaoImpl implements RoleDao {
 
-    private String userRole = "ROLE_USER";
-    private String adminRole = "ROLE_ADMIN";
-
     @PersistenceContext
     private EntityManager entityManager;
 

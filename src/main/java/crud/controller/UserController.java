@@ -23,9 +23,6 @@ public class UserController {
     private final RoleService roleService;
 
     @Autowired
-    PasswordEncoder bCryptPasswordEncoder;
-
-    @Autowired
     public UserController(UserService userService, RoleService roleService) {
         this.userService = userService;
         this.roleService = roleService;
@@ -74,7 +71,7 @@ public class UserController {
     }
 
     @PatchMapping(value = "/edit/{id}")
-    public String editUser(@ModelAttribute("user") User user, @PathVariable("id") long id,
+    public String editUser(@ModelAttribute("user") User user,
                            @RequestParam(value = "checkBoxRoles") String[] checkBoxRoles,
                            BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {

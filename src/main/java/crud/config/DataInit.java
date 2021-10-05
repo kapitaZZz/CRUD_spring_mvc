@@ -13,7 +13,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Component
-@Transactional
 public class DataInit {
 
     private final RoleService roleService;

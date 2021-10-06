@@ -63,6 +63,13 @@ public class UserController {
         return "redirect:/admin";
     }
 
+    @GetMapping(value = "/admin/new")
+    public String newUser(Model model) {
+        model.addAttribute("user", new User());
+        model.addAttribute("roles", roleService.getAllRoles());
+        return "new";
+    }
+
     @GetMapping(value = "/edit/{id}")
     public String editUserForm(@PathVariable("id") long id, Model model) {
         model.addAttribute("user", userService.getUserById(id));
